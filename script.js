@@ -73,6 +73,7 @@ class App {
 	#mapZoomLevel = 50 ;
 	#mapEvent;
 	#workouts = [];
+	#marker = [];
 
 	constructor(){
 		this._getPosition();
@@ -83,7 +84,13 @@ class App {
 		
 		inputType.addEventListener('change', this._toggleElevationField);
 
-		containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
+		// containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
+		containerWorkouts.addEventListener('click', e => this._moveToPopup(e));
+		containerWorkouts.addEventListener('dblclick', e => {
+			const workoutEl = e.target.closest('.workouts');
+			if (!workoutEl) return;
+			this._removeWorkout(workoutEl.dataset.id);
+    		});
 	}
 
 	_getPosition(){
@@ -182,27 +189,50 @@ class App {
 				
 	}
 	_renderWorkerMarker(workout){
-		L.marker(workout.coords)
-			.addTo(this.#map)
-			.bindPopup(L.popup({
-			maxWidth : 250,
-			minWidth : 100,
+		// L.marker(workout.coords)
+		// 	.addTo(this.#map)
+		// 	.bindPopup(L.popup({
+		// 	maxWidth : 250,
+		// 	minWidth : 100,
+		// 	autoClose: false,
+		// 	closeOnClick: false,
+		// 	className: `${workout.type}-popup`,
+		// 	})
+		// )
+		// .setPopupContent(
+		// 	`
+		// 	${workout.type === 'running' ? '🏃🏻‍♂️' : '🚴‍♀️'} ${workout.description}
+		// 	`
+		// 	)
+		// .openPopup();
+
+		const marker = L.marker(workout.coords);
+		console.log(marker);
+		this.#marker.push(marker);
+		marker
+		.addTo(this.#map)
+		.bindPopup(
+			L.popup({
+			maxWidth: 250,
+			minWidth: 100,
 			autoClose: false,
 			closeOnClick: false,
 			className: `${workout.type}-popup`,
-			})
-		)
+        	})
+      			)
 		.setPopupContent(
 			`
-			${workout.type === 'running' ? '🏃🏻‍♂️' : '🚴‍♀️'} ${workout.description}
-			`
-			)
+			${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'}${workout.description}
+		`)
 		.openPopup();
+
+		
 	}
 
 	_renderWorkout(workout){
 		 let html = `
 		 <li class="workout workout--${workout.type}" data-id="${workout.id}">
+		 	<button onclick = "">Delete</button>
 			<h2 class="workout__title">${workout.description}</h2>
 			<div class="workout__details">
 			  <span class="workout__icon">
@@ -289,6 +319,17 @@ class App {
 		localStorage.removeItem('workouts');
 		location.reload();
 	}
+
+	_removeWorkout(id) {
+		this.#workouts.forEach((work, i) => {
+		  if (work.id === id) this.#workouts.splice(i, 1);
+		  this.#marker[i].remove();
+		  this.#marker.splice(i, 1);
+	    
+		  this._setLocalStorage();
+		//   document.getElementById(id).remove();
+		});
+	      }
 
 }
 
