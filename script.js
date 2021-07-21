@@ -110,6 +110,10 @@ class App {
 
 		this.#map.on('click', this._showForm.bind(this));
 
+		this.#workouts.forEach(work => {
+			this._renderWorkerMarker(work);
+		});
+
 	}
 	_showForm(mapE){
 		this.#mapEvent = mapE;
@@ -171,6 +175,7 @@ class App {
 		
 		this._hideForm(); 
 		
+		//LocalStorage to all workouts
 		this._setLocalStorage();
 		
 			//Display marker 
@@ -250,7 +255,6 @@ class App {
 
 	_moveToPopup(e){
 		const workoutEl = e.target.closest('.workout');
-		console.log(workoutEl);
 
 		if(!workoutEl) return;
 
@@ -264,14 +268,26 @@ class App {
 			}
 		});
 
-		workout.click();
+		// workout.click();
 	}
 	_setLocalStorage(){
 		localStorage.setItem('workouts',JSON.stringify(this.#workouts));
 	}
 	_getLocalStorage(){
 		const data = JSON.parse(localStorage.getItem('workouts'));
-		console.log(data);
+		
+		if(!data) return;
+
+		this.#workouts = data;
+
+		this.#workouts.forEach(work => {
+			this._renderWorkout(work);
+		});
+	}
+
+	reset(){
+		localStorage.removeItem('workouts');
+		location.reload();
 	}
 
 }
