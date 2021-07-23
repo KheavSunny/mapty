@@ -86,8 +86,9 @@ class App {
 
 		// containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
 		containerWorkouts.addEventListener('click', e => this._moveToPopup(e));
+		
 		containerWorkouts.addEventListener('dblclick', e => {
-			const workoutEl = e.target.closest('.workouts');
+			const workoutEl = e.target.closest('.workout');
 			if (!workoutEl) return;
 			this._removeWorkout(workoutEl.dataset.id);
     		});
@@ -300,6 +301,8 @@ class App {
 
 		// workout.click();
 	}
+
+
 	_setLocalStorage(){
 		localStorage.setItem('workouts',JSON.stringify(this.#workouts));
 	}
@@ -327,7 +330,8 @@ class App {
 		  this.#marker.splice(i, 1);
 	    
 		  this._setLocalStorage();
-		//   document.getElementById(id).remove();
+
+		  document.querySelector(`[data-id='${id}']`).remove();
 		});
 	      }
 
